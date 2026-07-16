@@ -1,7 +1,10 @@
 <?php
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+require_once '../includes/data.php'; // starts the session + gives us $conn
+
+// record the logout while we still know who they are
+if (!empty($_SESSION['authenticated'])) {
+    log_activity($conn, 'logout');
 }
 
 unset($_SESSION['authenticated']);

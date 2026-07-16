@@ -86,6 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (mysqli_stmt_execute($stmt)) {
             mysqli_stmt_close($stmt);
 
+            log_activity($conn, 'register', $values['email']);
+
             // mail   verify link
             require_once '../includes/mailer.php';
             $mailSent = send_verification_email($values['email'], $values['full_name'], $token);
@@ -99,7 +101,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $errorCode = mysqli_stmt_errno($stmt);
             mysqli_stmt_close($stmt);
             if ($errorCode == 1062) {
-                // 1062 = duplicate key, meaning the email is taken
                 $errors['email'] = 'That email is already registered.';
             } else {
                 $errors['general'] = 'Registration failed. Please try again.';

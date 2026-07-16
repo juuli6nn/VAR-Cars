@@ -229,10 +229,20 @@ require_once '../includes/header.php';
         <aside class="summary-card" aria-label="Order summary">
             <h3>Order Summary</h3>
 
-            <?php foreach ($cartItems as $car): ?>
+            <?php
+            // group duplicates so "2 × same model" shows as one line
+            $grouped = array();
+            foreach ($cartItems as $car) {
+                $cid = (int)$car['id'];
+                if (!isset($grouped[$cid])) {
+                    $grouped[$cid] = array('car' => $car, 'qty' => 0);
+                }
+                $grouped[$cid]['qty']++;
+            }
+            foreach ($grouped as $g): $car = $g['car']; $qty = $g['qty']; ?>
             <div class="summary-line">
-                <span><?= htmlspecialchars($car['make'] . ' ' . $car['model'], ENT_QUOTES, 'UTF-8') ?></span>
-                <span><?= fmt_price($car['price']) ?></span>
+                <span><?= htmlspecialchars($car['make'] . ' ' . $car['model'], ENT_QUOTES, 'UTF-8') ?><?= $qty > 1 ? ' &times;' . $qty : '' ?></span>
+                <span><?= fmt_price($car['price'] * $qty) ?></span>
             </div>
             <?php endforeach; ?>
 

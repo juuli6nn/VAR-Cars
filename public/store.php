@@ -72,15 +72,27 @@ require_once '../includes/header.php';
     <div class="car-grid">
         <?php foreach ($cars as $car): ?>
         <article class="car-card">
+            <?php $soldOut = (int)$car['stock'] <= 0; ?>
             <div class="car-card__thumb"
-                 style="background-image:url('/VAR-Cars/public/assets/images/<?= rawurlencode($car['img']) ?>');"
+                 style="background-image:url('/VAR-Cars/public/assets/images/<?= rawurlencode($car['img']) ?>');position:relative;"
                  role="img"
                  aria-label="<?= htmlspecialchars($car['make'] . ' ' . $car['model'], ENT_QUOTES, 'UTF-8') ?>">
+                <?php if ($soldOut): ?>
+                <span style="position:absolute;top:0.75rem;left:0.75rem;background:#c0392b;color:#fff;font-size:0.7rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:4px;">Sold Out</span>
+                <?php endif; ?>
             </div>
 
             <div class="car-card__body">
                 <div class="car-card__meta">
                     <span class="car-card__year"><?= (int)$car['year'] ?></span>
+                    <?php $stock = (int)$car['stock']; ?>
+                    <?php if ($soldOut): ?>
+                    <span style="color:#c0392b;font-size:0.75rem;font-weight:700;">Sold out</span>
+                    <?php elseif ($stock <= 2): ?>
+                    <span style="color:#e67e22;font-size:0.75rem;font-weight:700;">Only <?= $stock ?> left</span>
+                    <?php else: ?>
+                    <span style="color:#27ae60;font-size:0.75rem;font-weight:600;"><?= $stock ?> in stock</span>
+                    <?php endif; ?>
                 </div>
                 <p class="car-card__name"><?= htmlspecialchars($car['make'] . ' ' . $car['model'], ENT_QUOTES, 'UTF-8') ?></p>
                 <p class="car-card__type">
@@ -92,12 +104,16 @@ require_once '../includes/header.php';
 
             <div class="car-card__actions">
                 <?php if (empty($_SESSION['is_admin'])): ?>
-                <form method="POST" action="add-to-cart.php" style="width:100%;">
-                    <input type="hidden" name="vehicle_id" value="<?= (int)$car['id'] ?>">
-                    <input type="hidden" name="redirect"
-                           value="store.php<?= $activeBrand ? '?brand=' . urlencode($activeBrand) : '' ?>">
-                    <button type="submit" class="button button--primary button--sm button--full">Add to cart</button>
-                </form>
+                    <?php if ($soldOut): ?>
+                    <button type="button" class="button button--ghost button--sm button--full" style="cursor:not-allowed;opacity:0.6;" disabled>Sold out</button>
+                    <?php else: ?>
+                    <form method="POST" action="add-to-cart.php" style="width:100%;">
+                        <input type="hidden" name="vehicle_id" value="<?= (int)$car['id'] ?>">
+                        <input type="hidden" name="redirect"
+                               value="store.php<?= $activeBrand ? '?brand=' . urlencode($activeBrand) : '' ?>">
+                        <button type="submit" class="button button--primary button--sm button--full">Add to cart</button>
+                    </form>
+                    <?php endif; ?>
                 <?php else: ?>
                 <span class="button button--ghost button--sm button--full" style="cursor:default;">Admin view</span>
                 <?php endif; ?>

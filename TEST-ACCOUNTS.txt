@@ -5,12 +5,13 @@ This website is for educational purposes only and is a requirement
 for our final project.
 
 
-ADMIN ACCOUNT
--------------
+ADMIN ACCOUNT (superadmin, hardcoded)
+-------------------------------------
 Email    : admin@varcars.com
 Password : 123
 
-Logs into the admin dashboard (sales stats, all orders, catalogue).
+Logs into the admin dashboard (sales stats, all orders, catalogue,
+users & roles, inventory + audit log reports).
 Admin accounts cannot shop or use the cart.
 
 
@@ -18,9 +19,11 @@ SAMPLE USER ACCOUNTS (pre-verified, can log in immediately)
 -----------------------------------------------------------
 Email    : nagiseishiro@email.com
 Password : 1234
+Role     : ADMIN (can access the admin dashboard)
 
 Email    : isagiyoichi@email.com
 Password : 1234
+Role     : regular buyer
 
 
 REGISTERING A NEW ACCOUNT

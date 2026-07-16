@@ -37,11 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['flash']         = 'Welcome, Admin!';
             $_SESSION['flash_type']    = 'success';
 
+            log_activity($conn, 'login', 'superadmin');
             header('Location: admin/index.php');
             exit;
         }
 
-        $sql  = "SELECT id, full_name, email, password, is_verified FROM users WHERE email = ?";
+        $sql  = "SELECT id, full_name, email, password, is_verified, is_admin FROM users WHERE email = ?";
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param($stmt, 's', $values['email']);
         mysqli_stmt_execute($stmt);
@@ -55,19 +56,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $errors['general'] = 'Please verify your email address before logging in. Check your inbox for the verification link.';
         } else {
             $_SESSION['authenticated'] = true;
-            $_SESSION['is_admin']      = false;
+            $_SESSION['is_admin']      = (bool)$user['is_admin'];
             $_SESSION['user_id']       = $user['id'];
             $_SESSION['user_email']    = $user['email'];
             $_SESSION['username']      = $user['full_name'];
 
+            log_activity($conn, 'login');
+
             $_SESSION['cart'] = array();
-            $sql  = "SELECT vehicle_id FROM cart_items WHERE user_id = ? ORDER BY added_at";
+            $sql  = "SELECT vehicle_id, qty FROM cart_items WHERE user_id = ? ORDER BY added_at";
             $stmt = mysqli_prepare($conn, $sql);
             mysqli_stmt_bind_param($stmt, 'i', $user['id']);
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
             while ($row = mysqli_fetch_assoc($result)) {
-                $_SESSION['cart'][] = (int)$row['vehicle_id'];
+                $qty = max(1, (int)$row['qty']);
+                for ($i = 0; $i < $qty; $i++) {
+                    $_SESSION['cart'][] = (int)$row['vehicle_id'];
+                }
             }
             mysqli_stmt_close($stmt);
 

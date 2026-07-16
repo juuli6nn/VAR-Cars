@@ -53,6 +53,16 @@ $pageTitle = htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8');
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
                 Catalogue
             </a>
+            <a href="/VAR-Cars/public/admin/users.php"
+               class="admin-sidebar__link <?= ($adminPage == 'users') ? 'active' : '' ?>">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Users
+            </a>
+            <a href="/VAR-Cars/public/admin/reports.php"
+               class="admin-sidebar__link <?= ($adminPage == 'reports') ? 'active' : '' ?>">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Reports
+            </a>
 
             <p class="admin-sidebar__section-label" style="margin-top:var(--space-lg);">Site</p>
             <a href="/VAR-Cars/public/index.php" class="admin-sidebar__link">

@@ -2,14 +2,20 @@
 require_once '../includes/data.php';
 
 $cartIds   = isset($_SESSION['cart']) ? $_SESSION['cart'] : array();
-$cartItems = array();
+$cartItems = array();   // grouped by vehicle id, each entry has 'car' + 'qty'
 $cartTotal = 0;
+$cartUnits = 0;
 
 foreach ($cartIds as $id) {
-    $car = find_car((int)$id, $ALL_CARS);
+    $id  = (int)$id;
+    $car = find_car($id, $ALL_CARS);
     if ($car != null) {
-        $cartItems[] = $car;
-        $cartTotal  += $car['price'];
+        if (!isset($cartItems[$id])) {
+            $cartItems[$id] = array('car' => $car, 'qty' => 0);
+        }
+        $cartItems[$id]['qty']++;
+        $cartTotal += $car['price'];
+        $cartUnits++;
     }
 }
 
@@ -28,7 +34,7 @@ require_once '../includes/header.php';
         <div>
             <h1 style="font-size:var(--text-2xl);">Your Cart</h1>
             <p class="section-head__sub">
-                <?= count($cartItems) ?> vehicle<?= count($cartItems) != 1 ? 's' : '' ?> selected
+                <?= $cartUnits ?> vehicle<?= $cartUnits != 1 ? 's' : '' ?> selected
             </p>
         </div>
         <a class="button button--ghost" href="store.php">&larr; Keep browsing</a>
@@ -52,12 +58,13 @@ require_once '../includes/header.php';
                 <thead>
                     <tr>
                         <th>Vehicle</th>
+                        <th style="text-align:center;">Qty</th>
                         <th class="text-right">Price</th>
                         <th><span class="sr-only">Remove</span></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($cartItems as $car): ?>
+                    <?php foreach ($cartItems as $item): $car = $item['car']; $qty = $item['qty']; ?>
                     <tr>
                         <!-- Thumbnail + name -->
                         <td>
@@ -80,15 +87,43 @@ require_once '../includes/header.php';
                             </div>
                         </td>
 
+                        <!-- Quantity controls -->
+                        <td>
+                            <div style="display:flex;align-items:center;justify-content:center;gap:var(--space-sm);">
+                                <form method="POST" action="remove-from-cart.php">
+                                    <input type="hidden" name="vehicle_id" value="<?= (int)$car['id'] ?>">
+                                    <input type="hidden" name="mode" value="one">
+                                    <button type="submit" class="button button--ghost button--sm"
+                                            aria-label="Remove one" title="Remove one">&minus;</button>
+                                </form>
+                                <span style="min-width:1.5rem;text-align:center;font-weight:600;"><?= $qty ?></span>
+                                <?php if ($qty < (int)$car['stock']): ?>
+                                <form method="POST" action="add-to-cart.php">
+                                    <input type="hidden" name="vehicle_id" value="<?= (int)$car['id'] ?>">
+                                    <input type="hidden" name="redirect" value="cart.php">
+                                    <button type="submit" class="button button--ghost button--sm"
+                                            aria-label="Add one more" title="Add one more">+</button>
+                                </form>
+                                <?php else: ?>
+                                <button type="button" class="button button--ghost button--sm" disabled
+                                        title="No more in stock">+</button>
+                                <?php endif; ?>
+                            </div>
+                        </td>
+
                         <!-- Price -->
                         <td class="cart-item__price text-right">
-                            <?= fmt_price($car['price']) ?>
+                            <?= fmt_price($car['price'] * $qty) ?>
+                            <?php if ($qty > 1): ?>
+                            <div class="text-muted text-sm"><?= $qty ?> &times; <?= fmt_price($car['price']) ?></div>
+                            <?php endif; ?>
                         </td>
 
                         <!-- Remove -->
                         <td>
                             <form method="POST" action="remove-from-cart.php">
                                 <input type="hidden" name="vehicle_id" value="<?= (int)$car['id'] ?>">
+                                <input type="hidden" name="mode" value="all">
                                 <button type="submit" class="button button--danger button--sm">
                                     Remove
                                 </button>
@@ -104,10 +139,10 @@ require_once '../includes/header.php';
         <aside class="summary-card" aria-label="Order summary">
             <h3>Order Summary</h3>
 
-            <?php foreach ($cartItems as $car): ?>
+            <?php foreach ($cartItems as $item): $car = $item['car']; $qty = $item['qty']; ?>
             <div class="summary-line">
-                <span><?= htmlspecialchars($car['make'] . ' ' . $car['model'], ENT_QUOTES, 'UTF-8') ?></span>
-                <span><?= fmt_price($car['price']) ?></span>
+                <span><?= htmlspecialchars($car['make'] . ' ' . $car['model'], ENT_QUOTES, 'UTF-8') ?><?= $qty > 1 ? ' &times;' . $qty : '' ?></span>
+                <span><?= fmt_price($car['price'] * $qty) ?></span>
             </div>
             <?php endforeach; ?>
 

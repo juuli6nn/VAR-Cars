@@ -39,7 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $values['card_expiry'] = trim(isset($_POST['card_expiry']) ? $_POST['card_expiry'] : '');
     $values['card_cvv']    = trim(isset($_POST['card_cvv'])    ? $_POST['card_cvv']    : '');
 
-    // bank transfer has no card fields, so only validate for credit/debit
     if ($values['pay_method'] == 'credit' || $values['pay_method'] == 'debit') {
 
         if ($values['card_name'] == '') {
@@ -64,6 +63,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } elseif (!preg_match('/^\d{3,4}$/', $values['card_cvv'])) {
             $errors['card_cvv'] = 'CVV must be 3 or 4 digits.';
         }
+    }
+
+    // make sure nothing in the cart sold out while the user was checking out
+    $needed = array();               // vehicle_id => units requested
+    foreach ($cartItems as $item) {
+        $vid = (int)$item['id'];
+        $needed[$vid] = isset($needed[$vid]) ? $needed[$vid] + 1 : 1;
+    }
+    $soldOut = array();
+    foreach ($needed as $vid => $qty) {
+        $stmt = mysqli_prepare($conn, "SELECT make, model, stock FROM vehicles WHERE id = ?");
+        mysqli_stmt_bind_param($stmt, 'i', $vid);
+        mysqli_stmt_execute($stmt);
+        $row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+        mysqli_stmt_close($stmt);
+        if (!$row || (int)$row['stock'] < $qty) {
+            $soldOut[] = $row ? ($row['make'] . ' ' . $row['model']) : ('Vehicle #' . $vid);
+        }
+    }
+    if (!empty($soldOut)) {
+        $errors['stock'] = 'Sorry, these are no longer available: ' . implode(', ', $soldOut) . '. Please remove them from your cart.';
     }
 
     if (empty($errors)) {
@@ -96,6 +116,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             mysqli_stmt_execute($stmt);
         }
         mysqli_stmt_close($stmt);
+
+        // draw down stock, one unit per purchased vehicle (never below 0)
+        $sql  = "UPDATE vehicles SET stock = GREATEST(stock - 1, 0) WHERE id = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        foreach ($cartItems as $item) {
+            $vid = (int)$item['id'];
+            mysqli_stmt_bind_param($stmt, 'i', $vid);
+            mysqli_stmt_execute($stmt);
+        }
+        mysqli_stmt_close($stmt);
+
+        log_activity($conn, 'order_placed', 'Order #' . $orderId . ' — ' . fmt_price($cartTotal));
 
         unset($_SESSION['cart'], $_SESSION['order_details']);
         if (!empty($_SESSION['user_id'])) {
@@ -144,6 +176,12 @@ require_once '../includes/header.php';
 
         <!-- Left: payment form -->
         <form class="checkout-form" method="POST" action="payment.php" novalidate id="payment-form">
+
+            <?php if (isset($errors['stock'])): ?>
+            <div class="flash flash--error" style="margin-bottom:var(--space-md);">
+                <?= htmlspecialchars($errors['stock'], ENT_QUOTES, 'UTF-8') ?>
+            </div>
+            <?php endif; ?>
 
             <!-- Payment method selector -->
             <div class="checkout-form__section">
@@ -283,10 +321,20 @@ require_once '../includes/header.php';
         <aside class="summary-card" aria-label="Order summary">
             <h3>Order Summary</h3>
 
-            <?php foreach ($cartItems as $car): ?>
+            <?php
+            // group duplicates so "2 × same model" shows as one line
+            $grouped = array();
+            foreach ($cartItems as $car) {
+                $cid = (int)$car['id'];
+                if (!isset($grouped[$cid])) {
+                    $grouped[$cid] = array('car' => $car, 'qty' => 0);
+                }
+                $grouped[$cid]['qty']++;
+            }
+            foreach ($grouped as $g): $car = $g['car']; $qty = $g['qty']; ?>
             <div class="summary-line">
-                <span><?= htmlspecialchars($car['make'] . ' ' . $car['model'], ENT_QUOTES, 'UTF-8') ?></span>
-                <span><?= fmt_price($car['price']) ?></span>
+                <span><?= htmlspecialchars($car['make'] . ' ' . $car['model'], ENT_QUOTES, 'UTF-8') ?><?= $qty > 1 ? ' &times;' . $qty : '' ?></span>
+                <span><?= fmt_price($car['price'] * $qty) ?></span>
             </div>
             <?php endforeach; ?>
 

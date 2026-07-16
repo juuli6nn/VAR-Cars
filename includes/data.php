@@ -58,3 +58,20 @@ function filter_by_brand($cars, $brand) {
 function fmt_price($price) {
     return '₱' . number_format($price, 2);
 }
+
+function log_activity($conn, $action, $details = '') {
+    $actor = isset($_SESSION['user_email']) ? $_SESSION['user_email'] : 'guest';
+    $role  = !empty($_SESSION['is_admin'])      ? 'admin'
+           : (!empty($_SESSION['authenticated']) ? 'user' : 'guest');
+
+    $stmt = mysqli_prepare(
+        $conn,
+        "INSERT INTO activity_log (actor, role, action, details) VALUES (?, ?, ?, ?)"
+    );
+    if (!$stmt) {
+        return;
+    }
+    mysqli_stmt_bind_param($stmt, 'ssss', $actor, $role, $action, $details);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+}

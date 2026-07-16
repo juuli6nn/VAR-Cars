@@ -25,6 +25,7 @@ Password: `123`
 
 Email: `nagiseishiro@email.com`
 Password: `1234`
+(also has admin access)
 
 Email: `isagiyoichi@email.com`
 Password: `1234`
