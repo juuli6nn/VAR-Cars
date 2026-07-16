@@ -36,8 +36,8 @@
         <!-- Disclaimer bar -->
         <div class="site-footer__bottom">
             <p>
-                Disclaimer: This website is for educational purposes only and is a requirement
-                for our final project in Applications Development and Emerging Technologies.
+                Disclaimer: This website is for <strong>educational purposes only</strong> and is a requirement
+                for our final project in <strong>Applications Development and Emerging Technologies</strong>.
                 No real vehicles are sold and no real payments are processed.
             </p>
             <p>&copy; 2026 VAR Cars &mdash; a project by Anthrowpic.</p>
