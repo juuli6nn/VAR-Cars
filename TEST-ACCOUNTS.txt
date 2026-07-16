@@ -1,0 +1,40 @@
+VAR CARS - SAMPLE ACCOUNTS FOR TESTING
+=======================================
+
+This website is for educational purposes only and is a requirement
+for our final project.
+
+
+ADMIN ACCOUNT
+-------------
+Email    : admin@varcars.com
+Password : 123
+
+Logs into the admin dashboard (sales stats, all orders, catalogue).
+Admin accounts cannot shop or use the cart.
+
+
+SAMPLE USER ACCOUNTS (pre-verified, can log in immediately)
+-----------------------------------------------------------
+Email    : nagiseishiro@email.com
+Password : 1234
+
+Email    : isagiyoichi@email.com
+Password : 1234
+
+Regular customer accounts. Can browse, add to cart, and check out.
+
+
+REGISTERING A NEW ACCOUNT
+-------------------------
+Use a REAL email address - the site sends a verification link and the
+account cannot log in until the link is clicked.
+
+Password rules: at least 8 characters, one uppercase letter, one number.
+Example valid password: Test@1234
+
+
+TEST PAYMENT
+------------
+No real payment is processed. Card details come pre-filled with demo
+values (Visa test number 4111 1111 1111 1111) - just press Confirm Order.

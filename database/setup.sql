@@ -8,10 +8,9 @@
 --   Password : 123
 --   Access   : /public/admin/index.php
 --
--- SAMPLE USERS (inserted below, password = User@1234)
---   juan.delacruz@email.com
---   maria.santos@email.com
---   carlos.reyes@email.com
+-- SAMPLE USERS (inserted below, password = 1234)
+--   nagiseishiro@email.com
+--   isagiyoichi@email.com
 -- ─────────────────────────────────────────────────────────────
 
 CREATE DATABASE IF NOT EXISTS var_cars
@@ -104,8 +103,8 @@ CREATE TABLE IF NOT EXISTS order_items (
 );
 
 -- ─────────────────────────────────────────────────────────────
--- Sample user accounts (password for all: User@1234)
--- MD5('User@1234') = uses MySQL's built-in MD5() — matches PHP md5()
+-- Sample user accounts (password for all: 1234)
+-- MD5() here matches PHP's md5() so logins work
 -- ─────────────────────────────────────────────────────────────
 -- is_verified = 1 so sample accounts can log in immediately without going through email
 INSERT INTO users (full_name, email, password, address, contact, is_verified) VALUES
