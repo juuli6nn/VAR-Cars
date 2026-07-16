@@ -1,0 +1,15 @@
+
+# credentials (production uses env vars)
+includes/secrets.php
+
+# git internals
+.git
+.gitignore
+
+# local dev clutter
+.vscode
+*.md
+
+# docker files aren't needed inside the image
+Dockerfile
+.dockerignore

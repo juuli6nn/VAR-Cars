@@ -1,0 +1,4 @@
+# credentials - never commit
+includes/secrets.php
+
+.hallmark/
