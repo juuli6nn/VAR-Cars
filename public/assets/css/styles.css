@@ -1303,6 +1303,23 @@ a {
     color: var(--c-white);
 }
 
+/* disclaimer bar under the columns */
+.site-footer__bottom {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--c-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.site-footer__bottom p {
+    font-size: var(--text-xs);
+    color: var(--c-silver);
+    line-height: 1.7;
+    margin: 0;
+}
+
 
 /* ===== Utility classes ===== */
 
