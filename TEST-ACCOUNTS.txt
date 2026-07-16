@@ -22,8 +22,6 @@ Password : 1234
 Email    : isagiyoichi@email.com
 Password : 1234
 
-Regular customer accounts. Can browse, add to cart, and check out.
-
 
 REGISTERING A NEW ACCOUNT
 -------------------------
